@@ -3,7 +3,7 @@ import { data } from "@/src/lib/data";
 import { z } from "zod";
 
 export const adminValidationSchema = z.object({
-  username: z.string({
+  alias: z.string({
     invalid_type_error: "Invalid type",
     required_error: "username is required",
   }),
@@ -24,14 +24,14 @@ export const adminValidationSchema = z.object({
 export type AdminFormValues = z.infer<typeof adminValidationSchema>;
 
 export const adminInitialValues: AdminFormValues = {
-  username: "",
+  alias: "",
   email: "",
   password: "",
 };
 
 export const adminJsonFormFields: FormField<AdminFormValues>[] = [
   {
-    id: "username",
+    id: "alias",
     label: data.signup.form.userName,
     type: "text",
     placeholder: "John",

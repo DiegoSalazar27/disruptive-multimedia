@@ -19,6 +19,8 @@ import Link from "next/link";
 import { GenericForm } from "@/src/components/form/genericForm";
 import { useGetData } from "@/src/hooks/useGetTextData";
 import { useAuth } from "@/src/providers/authProvider";
+import { useMutation } from "@tanstack/react-query";
+import { User } from "@/src/models/user";
 
 export default function Login() {
   return (
@@ -32,29 +34,24 @@ export function LoginForm() {
   const router = useRouter();
   const { login: loginData } = useGetData();
   const { signin } = useAuth();
-
   const { toast } = useToast();
-
-  const handleSubmit = useCallback(
-    async (data: LoginFormValues) => {
-      try {
-        await signin(data);
-        toast({
-          title: loginData.loggedIn,
-        });
-        router.push("/");
-      } catch (error) {
-        console.log(error);
-
-        toast({
-          title: "Error signing in",
-          description: `error: ${error}`,
-        });
-        throw error;
-      }
+  const { mutateAsync } = useMutation<void, Error, LoginFormValues>({
+    mutationFn: async (data) => {
+      await signin(data);
     },
-    [router, signin, toast, loginData.loggedIn]
-  );
+    onSuccess: () => {
+      toast({
+        title: loginData.loggedIn,
+      })
+      router.push("/");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error signing in",
+        description: `error: ${error}`,
+      });
+    },
+  });
 
   return (
     <Card className="md:w-full max-w-sm">
@@ -64,7 +61,7 @@ export function LoginForm() {
       <CardContent className="flex flex-col gap-4">
         <GenericForm
           buttonText={loginData.login}
-          handleSubmit={handleSubmit}
+          handleSubmit={mutateAsync}
           initialValues={loginInitialValues}
           jsonFormFields={loginJsonFormFields}
           schema={loginValidationSchema}

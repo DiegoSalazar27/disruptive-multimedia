@@ -5,9 +5,11 @@ import { LoginFormValues } from "../app/login/models/login";
 import { SignUpFormValues } from "../app/signup/models/signUp";
 import { getCurrentUser, login, signUp } from "../datasource/auth/authService";
 import { AUTH_TOKEN } from "../models/const";
+import { useLocalStorage } from "../hooks/useLocalStorage";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 export interface AuthContextType {
-  user: User;
+  user?: User;
   isValidAdmin: () => boolean;
   signin: (credentials: LoginFormValues) => Promise<void>;
   signup: (credentials: SignUpFormValues) => Promise<void>;
@@ -16,53 +18,74 @@ export interface AuthContextType {
 
 export const AuthContext = React.createContext<AuthContextType>(null!);
 
+async function getCurrentUserQuery(token: string): Promise<User> {
+  try {
+    const userToken = token;
+    if (!userToken) {
+      return userEmpty();
+    }
+
+    const user = await getCurrentUser(userToken);
+
+    return user;
+  } catch (error) {
+    console.log(error);
+
+    return userEmpty();
+  }
+}
+
 export function AuthProvider({ children }: { children: JSX.Element }) {
-  const [user, setUser] = React.useState<User>({
-    id: "unknown", // So we know there's no response from server yet
-    email: "",
-    username: "Guest",
-    role: "lector",
+  const {
+    setValue: setToken,
+    refetch: refetchToken,
+  } = useLocalStorage(AUTH_TOKEN, "");
+  const client = useQueryClient();
+  const { data: user, refetch } = useQuery({
+    queryKey: ["currentUser"],
+    queryFn: async () => {
+      const token = localStorage.getItem(AUTH_TOKEN);
+      
+      if (token) {
+        return getCurrentUserQuery(token);
+      }
+
+      return userEmpty();
+    },
+    placeholderData: {
+      id: "unknown", // So we know there's no response from server yet
+      email: "",
+      alias: "Guest",
+      role: "lector",
+    },
   });
 
   const signin = async (credentials: LoginFormValues) => {
-    const result = await login(credentials);
-
-    const access_token = result!;
-
-    localStorage.setItem(AUTH_TOKEN, access_token);
-
-    await getCurrentUserQuery();
-  };
-
-  const getCurrentUserQuery = useCallback(async () => {
-    const userToken = localStorage.getItem(AUTH_TOKEN);
-    console.log(userToken);
-
-    if (!userToken) {
-      setUser(userEmpty());
-      return;
-    }
-
     try {
-      const user = await getCurrentUser(userToken);
-      console.log(user);
+      const result = await login(credentials);
 
-      setUser(user);
+      setToken(result);
+
+      refetchToken();
+      await client.invalidateQueries({
+        queryKey: ["currentUser"],
+      });
     } catch (error) {
       console.log(error);
-
-      setUser(userEmpty());
+      throw error;
     }
-  }, []);
+  };
 
   const signout = async () => {
     localStorage.removeItem(AUTH_TOKEN);
-    setUser(userEmpty());
+    refetchToken();
+    refetch();
   };
 
   const signup = async (credentials: SignUpFormValues) => {
     try {
       await signUp(credentials);
+      await signin(credentials);
     } catch (error) {
       console.log(error);
       throw error;
@@ -70,12 +93,8 @@ export function AuthProvider({ children }: { children: JSX.Element }) {
   };
 
   function isValidAdmin(): boolean {
-    return !!user.id && user.id !== "unknown";
+    return !!user!.id && user!.id !== "unknown";
   }
-
-  useEffect(() => {
-    getCurrentUserQuery();
-  }, [getCurrentUserQuery]);
 
   const value = { user, signin, signout, signup, isValidAdmin };
 

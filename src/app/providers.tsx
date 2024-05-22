@@ -5,6 +5,7 @@ import { ThemeProvider as NextThemesProvider } from "next-themes";
 import * as React from "react";
 import { Toaster } from "../components/ui/toaster";
 import { AuthProvider } from "../providers/authProvider";
+import { ConfirmationDialogProvider } from "../providers/confirmationDialog";
 
 function makeQueryClient() {
   return new QueryClient({
@@ -39,7 +40,9 @@ export function Providers(props: { children: React.ReactNode }) {
           enableSystem
           disableTransitionOnChange
         >
-          {props.children}
+          <ConfirmationDialogProvider>
+            {props.children}
+          </ConfirmationDialogProvider>
           <Toaster />
         </NextThemesProvider>
       </AuthProvider>

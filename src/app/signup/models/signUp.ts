@@ -16,6 +16,7 @@ export const signUpValidationSchema = z.object({
       required_error: "Password is required",
     })
     .min(6, "Password must be at least 6 characters long"),
+  role: z.string(),
 });
 
 export type SignUpFormValues = z.infer<typeof signUpValidationSchema>;
@@ -24,6 +25,7 @@ export const signUpInitialValues: SignUpFormValues = {
   username: "",
   email: "",
   password: "",
+  role: "lector",
 };
 
 export const signUpJsonFormFields: FormField<SignUpFormValues>[] = [

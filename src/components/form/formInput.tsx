@@ -9,25 +9,79 @@ import {
   FormMessage,
 } from "../ui/form";
 import { Input } from "../ui/input";
+import DropZone from "./dropzone";
+import { Select } from "../ui/select";
+import { useCallback } from "react";
+import { Switch } from "../ui/switch";
 
 export function FormInput<T>(props: FormField<T>) {
   const [parent] = useAutoAnimate();
   const { field } = useController<FormField<T>>({
     name: props.id.toString() as Path<FormField<T>>,
   });
-  
+
+  const inputComponent = useCallback(
+    (props: FormField<T>) => {
+      if (props.type === "select") {
+        const { options } = props;
+        return (
+          <Select {...field} value={field.value as string}>
+            {options.map((option, index) => (
+              <option key={index} value={option.value}>
+                {option.label || option.value}
+              </option>
+            ))}
+          </Select>
+        );
+      }
+
+      if (props.type === "boolean") {
+        return <Switch {...field} />;
+      }
+
+      if (props.type === "dropzone") {
+        return <DropZone {...field} />;
+      }
+
+      if (props.type === "textarea") {
+        return <textarea {...field} value={field.value as string} />;
+      }
+
+      if (props.type === "number") {
+        return (
+          <Input
+            type={props.type}
+            {...field}
+            onChange={(e) => {
+              field.onChange(Number(e.target.value));
+            }}
+            value={field.value as number}
+          />
+        );
+      }
+
+      return (
+        <Input placeholder={props.placeholder} type={props.type} {...field} />
+      );
+    },
+    [field]
+  );
+
   return (
-    <FormItem ref={parent}>
+    <FormItem className="flex flex-col" ref={parent}>
       {props.label && <FormLabel>{props.label}</FormLabel>}
-      <FormControl>
-        {props.component || (
-          <Input placeholder={props.placeholder} type={props.type} {...field} />
-        )}
-      </FormControl>
+      <FormControl>{props.component || inputComponent(props)}</FormControl>
       {props.description && (
         <FormDescription>{props.description}</FormDescription>
       )}
       <FormMessage />
     </FormItem>
   );
+}
+
+function InputField({ props, field }: any) {
+  if (props.type === "number") {
+  }
+
+  return;
 }

@@ -25,7 +25,7 @@ export function UserMenu() {
     });
   };
 
-  if (!isLoggedIn(user)) {
+  if (!isLoggedIn(user!)) {
     return (
       <div>
         <Link href={"/login"}>
@@ -45,13 +45,18 @@ export function UserMenu() {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>My Account</DropdownMenuLabel>
-        <DropdownMenuItem>{user.username}</DropdownMenuItem>
-        <DropdownMenuItem>{user.role}</DropdownMenuItem>
+        <DropdownMenuItem>{user!.alias}</DropdownMenuItem>
+        <DropdownMenuItem>{user!.role}</DropdownMenuItem>
         <DropdownMenuSeparator />
-        {user.role === "admin" && (
-          <DropdownMenuItem>
-            <Link href={"/admin"}>Admins</Link>
-          </DropdownMenuItem>
+        {user!.role === "admin" && (
+          <>
+            <DropdownMenuItem>
+              <Link href={"/admin"}>Admins</Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link href={"/users"}>Usuarios</Link>
+            </DropdownMenuItem>
+          </>
         )}
         <DropdownMenuItem onClick={handleSignout}>Logout</DropdownMenuItem>
       </DropdownMenuContent>

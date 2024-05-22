@@ -32,7 +32,8 @@ type InputType =
   | "string"
   | "phone"
   | "textarea"
-  | "file";
+  | "file"
+  | "dropzone";
 
 type InputProps = { type: InputType };
 

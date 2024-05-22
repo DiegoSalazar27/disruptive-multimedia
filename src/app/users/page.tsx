@@ -7,26 +7,22 @@ import {
   TableHeader,
   TableRow,
 } from "@/src/components/ui/table";
-import { getAdmins } from "@/src/datasource/users/admin";
-import { AddAdminModal } from "./components/addAdmin";
 import React from "react";
-import { DeleteAdmin } from "./components/deleteAdmin";
 import { useQuery } from "@tanstack/react-query";
 import { AUTH_TOKEN } from "@/src/models/const";
 import { useLocalStorage } from "@/src/hooks/useLocalStorage";
-import { useAuth } from "@/src/providers/authProvider";
+import { getUsers } from "@/src/datasource/users/users";
 
-export default function Admins() {
+export default function Users() {
   const { storedValue: token } = useLocalStorage(AUTH_TOKEN, "");
-  const { user } = useAuth();
   const {
-    data: admins,
+    data: users,
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["admins"],
+    queryKey: ["users"],
     queryFn: async () => {
-      return await getAdmins(token);
+      return await getUsers(token);
     },
     placeholderData: [],
     enabled: !!token,
@@ -43,8 +39,7 @@ export default function Admins() {
   return (
     <div className="px-8 py-4">
       <div className="flex justify-between w-full">
-        <h1>Admins</h1>
-        <AddAdminModal></AddAdminModal>
+        <h1>Users</h1>
       </div>
       <Table className="px-8 py-4">
         <TableHeader>
@@ -52,19 +47,17 @@ export default function Admins() {
             <TableHead className="w-[100px]">id</TableHead>
             <TableHead>Alias</TableHead>
             <TableHead>email</TableHead>
-            <TableHead>Actions</TableHead>
+            <TableHead>Rol</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {admins &&
-            admins.map((admin) => (
-              <TableRow key={admin.id}>
-                <TableCell>{admin.id}</TableCell>
-                <TableCell>{admin.alias}</TableCell>
-                <TableCell>{admin.email}</TableCell>
-                <TableCell>
-                  {admin.id !== user?.id && <DeleteAdmin id={admin.id} />}
-                </TableCell>
+          {users &&
+            users.map((user) => (
+              <TableRow key={user.id}>
+                <TableCell>{user.id}</TableCell>
+                <TableCell>{user.alias}</TableCell>
+                <TableCell>{user.email}</TableCell>
+                <TableCell>{user.role}</TableCell>
               </TableRow>
             ))}
         </TableBody>

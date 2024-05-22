@@ -1,3 +1,4 @@
+"use client";
 import { GenericForm } from "@/src/components/form/genericForm";
 import {
   AdminFormValues,
@@ -5,23 +6,52 @@ import {
   adminJsonFormFields,
   adminValidationSchema,
 } from "../models/admin";
-import { useMutation } from "@tanstack/react-query";
-import { createAdmin } from "@/src/datasource/admin/admin";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createAdmin } from "@/src/datasource/users/admin";
 import { User } from "@/src/models/user";
+import {
+  FormDialog,
+  useFormDialog,
+} from "@/src/components/formDialog/formDialog";
+import { useToast } from "@/src/components/ui/use-toast";
+
+export function AddAdminModal() {
+  return (
+    <FormDialog title="Add Admin">
+      <AddAdmin />
+    </FormDialog>
+  );
+}
 
 export function AddAdmin() {
   return (
-    <div>
-      <h1>Add Admin</h1>
+    <div className="w-full">
       <AddAdminForm />
     </div>
   );
 }
 
 function AddAdminForm() {
-  const { mutate, data } = useMutation<User, Error, AdminFormValues>({
+  const { toast } = useToast();
+  const { onClose } = useFormDialog();
+  const client = useQueryClient();
+  const { mutateAsync } = useMutation<User, Error, AdminFormValues>({
     mutationFn: async (values: AdminFormValues) => {
       return createAdmin(values);
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Admin created",
+        description: `Admin ${data.alias} was created successfully!`,
+      });
+      client.invalidateQueries({ queryKey: ["admins"] });
+      onClose();
+    },
+    onError: (error) => {
+      toast({
+        title: "Error creating admin",
+        description: error.message,
+      });
     },
   });
 
@@ -32,7 +62,7 @@ function AddAdminForm() {
       jsonFormFields={adminJsonFormFields}
       schema={adminValidationSchema}
       submitingButtonText="Adding Admin..."
-      handleSubmit={(data) => mutate(data)}
+      handleSubmit={async (data) => await mutateAsync(data)}
     />
   );
 }

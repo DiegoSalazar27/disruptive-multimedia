@@ -19,53 +19,70 @@ import {
   signUpValidationSchema,
 } from "./models/signUp";
 import { useAuth } from "@/src/providers/authProvider";
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/src/components/ui/tabs";
+import { useMutation } from "@tanstack/react-query";
 
-export default function LoginPage() {
+export default function SignUpPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-4">
-      <LoginForm />
+      <Tabs defaultValue="reader" className="w-[400px]">
+        <TabsList className="grid w-full grid-cols-2">
+          <TabsTrigger value="reader">Lector</TabsTrigger>
+          <TabsTrigger value="creator">Creador</TabsTrigger>
+        </TabsList>
+        <TabsContent value="reader">
+          <SignUpForm role="reader" title="Aprende sobre el mundo" />
+        </TabsContent>
+        <TabsContent value="creator">
+          <SignUpForm
+            role="creator"
+            title="Comparte tu conocimiento con el mundo"
+          />
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
 
-function LoginForm() {
+function SignUpForm({ title, role }: { title?: string; role: string }) {
   const router = useRouter();
   const { signup: signUpData } = useGetData();
   const { toast } = useToast();
-  const { signin } = useAuth();
-
-  const handleSubmit = useCallback(
-    async (data: SignUpFormValues) => {
-      try {
-        await signin(data);
-        toast({
-          title: signUpData.signedUp,
-        });
-        router.push("/");
-      } catch (error) {
-        console.log(error);
-
-        toast({
-          title: "Error signing up",
-          description: `error: ${error}`,
-        });
-        throw error;
-      }
+  const { signup } = useAuth();
+  const { mutateAsync } = useMutation<void, Error, SignUpFormValues>({
+    mutationFn: async (data) => {
+      await signup(data);
     },
-    [router, toast, signUpData.signedUp, signin]
-  );
+    onSuccess: () => {
+      toast({
+        title: signUpData.signedUp,
+      });
+      router.push("/");
+    },
+    onError: (error) => {
+      toast({
+        title: "Error signing up",
+        description: `error: ${error}`,
+      });
+    },
+  });
 
   return (
     <Card className="md:w-full max-w-sm">
       <CardHeader>
         <CardTitle className="text-xl">{signUpData.signUp}</CardTitle>
-        <CardDescription>{signUpData.signUpMessage}</CardDescription>
+        <CardDescription>{title}</CardDescription>
       </CardHeader>
       <CardContent>
         <GenericForm
           buttonText={signUpData.signUp}
-          handleSubmit={handleSubmit}
-          initialValues={signUpInitialValues}
+          handleSubmit={mutateAsync}
+          initialValues={{ ...signUpInitialValues, role }}
           jsonFormFields={signUpJsonFormFields}
           schema={signUpValidationSchema}
           submitingButtonText={signUpData.signingUp}
