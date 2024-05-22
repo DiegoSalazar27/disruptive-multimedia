@@ -40,10 +40,10 @@ function AddCategoryForm({ topicId }: { topicId: string }) {
   const client = useQueryClient();
   const { mutateAsync } = useMutation<Category, Error, CategoryFormValues>({
     mutationFn: async (values: CategoryFormValues) => {
-      const { url } = await uploadFile(values.coverFile, token);
-      console.log(url);
+      // const { url } = await uploadFile(values.coverFile, token);
+      // console.log(url);
       return createCategoryOfTopic(
-        { ...values, topicId, coverUrl: url },
+        { ...values, topicId, coverUrl: "https://twitter.com/googleespanol" },
         token
       );
     },
@@ -52,7 +52,7 @@ function AddCategoryForm({ topicId }: { topicId: string }) {
         title: "Category created",
         description: `Category ${data.name} was created successfully!`,
       });
-      client.invalidateQueries({ queryKey: ["categories"] });
+      client.invalidateQueries({ queryKey: ["categoriesOfTopic"] });
       onClose();
     },
     onError: (error) => {

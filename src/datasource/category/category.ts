@@ -42,7 +42,7 @@ export async function createCategoryOfTopic(
   token: string
 ) {
   try {
-    const resp = await fetch(`${serverUrl}/topic/id/categories`, {
+    const resp = await fetch(`${serverUrl}/topic/${values.topicId}/categories`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
