@@ -23,7 +23,7 @@ export default function TopicsList() {
   }
 
   return topics!.map((topic, index) => (
-    <Link href={`/tematica/${topic.id}`} key={topic.id}>
+    <Link href={`/topic/${topic.id}`} key={topic.id}>
       <div className="w-full flex justify-between py-2">
         <span>{topic.name}</span>
       </div>

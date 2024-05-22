@@ -5,16 +5,48 @@ import {
 import { serverUrl } from "@/src/models/const";
 import { ServerResponse } from "@/src/models/serverResponse";
 
-export async function createCategory(
-  values: CategoryFormValues,
+export async function getCategoriesOfTopic({
+  topicId,
+  token,
+}: {
+  topicId: string;
+  token: string;
+}) {
+  try {
+    console.log(topicId, token);
+    const resp = await fetch(`${serverUrl}/topic/${topicId}/categories`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    const body = (await resp.json()) as ServerResponse<Category[]>;
+
+    if (body.code === "00") {
+      return body.info;
+    }
+
+    throw new Error(body.message);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function createCategoryOfTopic(
+  values: Omit<CategoryFormValues, "coverFile"> & {
+    topicId: string;
+    coverUrl: string;
+  },
   token: string
 ) {
   try {
-    const resp = await fetch(`${serverUrl}/topic/`, {
+    const resp = await fetch(`${serverUrl}/topic/id/categories`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        Autorization: `Bearer ${token}`,
+        Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ ...values }),
     });

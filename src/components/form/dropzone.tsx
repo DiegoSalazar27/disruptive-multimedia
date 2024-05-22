@@ -49,9 +49,11 @@ function DropZone({ name: id }: DropZoneParams) {
               ))}
             </div>
           )}
-          <Button variant={"outline"}>
-            <Upload />
-            Upload
+          <Button asChild variant={"outline"}>
+            <>
+              <Upload />
+              Upload
+            </>
           </Button>
         </>
       )}

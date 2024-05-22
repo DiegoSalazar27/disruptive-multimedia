@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const categoryValidationSchema = z.object({
   name: z.string(),
-  coverUrl: z.string().url(),
+  coverFile: z.any(),
   allowImage: z.boolean().optional(),
   allowVideo: z.boolean().optional(),
   allowText: z.boolean().optional(),
@@ -13,7 +13,7 @@ export type CategoryFormValues = z.infer<typeof categoryValidationSchema>;
 
 export const categoryInitialValues: CategoryFormValues = {
   name: "",
-  coverUrl: "",
+  coverFile: "",
   allowImage: false,
   allowVideo: false,
   allowText: false,
@@ -27,9 +27,9 @@ export const categoryJsonFormFields: FormField<CategoryFormValues>[] = [
     placeholder: "Matematicas",
   },
   {
-    id: "coverUrl",
+    id: "coverFile",
     label: "Imagen de la categoria",
-    type: "dropzone",
+    type: "file",
   },
   {
     id: "allowImage",

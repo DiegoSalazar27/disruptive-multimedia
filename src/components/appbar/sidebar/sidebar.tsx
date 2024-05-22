@@ -3,7 +3,7 @@ import Link from "next/link";
 import { useAuth } from "@/src/providers/authProvider";
 import { useMemo } from "react";
 import { AddTopicModal } from "@/src/app/topic/components/addTopic";
-import TopicsList from "./topics";
+import TopicsList from "../../../app/topic/components/topicsList";
 import { Logo } from "@/src/styles/icons/logo";
 
 export function SideBar() {
@@ -27,30 +27,6 @@ export function SideBar() {
             <div className="flex flex-col gap-1">
               <TopicsList />
             </div>
-            {/* <input
-              type="file"
-              onChange={async (e) => {
-                try {
-                  console.log("SENDING");
-                  const file = e.target.files![0];
-                  const form = new FormData();
-                  form.append("name", "test");
-                  form.append("file", file);
-
-                  await fetch("http://localhost:3001/upload", {
-                    method: "POST",
-                    headers: {
-                      "Content-Type": "multipart/form-data",
-                    },
-                    body: form,
-                  });
-
-                  console.log("done");
-                } catch (error) {
-                  console.log(error);
-                }
-              }}
-            /> */}
           </nav>
         </div>
       </div>
