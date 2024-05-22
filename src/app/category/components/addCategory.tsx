@@ -43,7 +43,7 @@ function AddCategoryForm({ topicId }: { topicId: string }) {
       // const { url } = await uploadFile(values.coverFile, token);
       // console.log(url);
       return createCategoryOfTopic(
-        { ...values, topicId, coverUrl: "https://twitter.com/googleespanol" },
+        { ...values, topicId, coverUrl: "https://t3.ftcdn.net/jpg/02/48/42/64/360_F_248426448_NVKLywWqArG2ADUxDq6QprtIzsF82dMF.jpg" },
         token
       );
     },
