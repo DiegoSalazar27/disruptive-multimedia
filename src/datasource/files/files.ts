@@ -2,11 +2,13 @@ import { ServerResponse } from "@/src/models/serverResponse";
 
 export async function uploadFile(file: File, token: string) {
   try {
-    const form = new FormData(); // Convert file to buff
-    form.append('file', file);
+    console.log(file.type);
+    const formData = new FormData(); // Convert file to buff
+    formData.append("file", file);
 
     const resp = await fetch("http://localhost:3001/files", {
-      body: form,
+      method: "POST",
+      body: formData,
     });
 
     const body = (await resp.json()) as ServerResponse<{ url: string }>;

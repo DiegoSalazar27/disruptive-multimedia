@@ -13,7 +13,6 @@ export async function getCategoriesOfTopic({
   token: string;
 }) {
   try {
-    console.log(topicId, token);
     const resp = await fetch(`${serverUrl}/topic/${topicId}/categories`, {
       method: "GET",
       headers: {
@@ -49,6 +48,28 @@ export async function createCategoryOfTopic(
         Authorization: `Bearer ${token}`,
       },
       body: JSON.stringify({ ...values }),
+    });
+    const body = (await resp.json()) as ServerResponse<Category>;
+
+    if (body.code === "00") {
+      return body.info;
+    }
+
+    throw new Error(body.message);
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+}
+
+export async function getCategory(id: string, token: string) {
+  try {
+    const resp = await fetch(`${serverUrl}/category/${id}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
     const body = (await resp.json()) as ServerResponse<Category>;
 

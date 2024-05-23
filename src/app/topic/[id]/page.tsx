@@ -6,9 +6,8 @@ import { getTopic } from "@/src/datasource/topic/topic";
 import CategoriesList from "../../category/components/categoriesList";
 
 export default function Topic({ params }: { params: { id: string } }) {
-  console.log(params.id);
   const { data } = useQuery({
-    queryKey: ["topic"],
+    queryKey: ["topic", params.id],
     queryFn: async () => {
       return getTopic(params.id);
     },

@@ -13,7 +13,7 @@ export default function CategoriesList({ topicId }: { topicId: string }) {
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["categoriesOfTopic"],
+    queryKey: ["categoriesOfTopic", topicId],
     queryFn: async () => {
       return await getCategoriesOfTopic({ token, topicId });
     },

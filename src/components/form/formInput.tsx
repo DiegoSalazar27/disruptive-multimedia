@@ -13,6 +13,7 @@ import DropZone from "./dropzone";
 import { Select } from "../ui/select";
 import { useCallback } from "react";
 import { Switch } from "../ui/switch";
+import { FileInput } from "./fileInput";
 
 export function FormInput<T>(props: FormField<T>) {
   const [parent] = useAutoAnimate();
@@ -45,6 +46,17 @@ export function FormInput<T>(props: FormField<T>) {
 
       if (props.type === "textarea") {
         return <textarea {...field} value={field.value as string} />;
+      }
+
+      if (props.type === "file") {
+        return (
+          <FileInput
+            name={field.name}
+            // {...field}
+            // value={field.value as FileList}
+            // onChange={(e) => field.onChange(e.target.files)}
+          />
+        );
       }
 
       if (props.type === "number") {
